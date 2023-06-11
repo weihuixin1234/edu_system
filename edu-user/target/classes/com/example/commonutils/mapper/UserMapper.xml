@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.commonutils.mapper.UserMapper">
+    <update id="deleteUserById">
+        update user set is_deleted = 1 where id = #{userId}
+    </update>
+    <update id="updateUserStatus">
+        update user set status = #{status} where id = #{userId}
+    </update>
+
+    <select id="getUserList" resultType="com.example.commonutils.entity.User">
+        select * from user
+        <where>
+            is_deleted = 0
+            <if test="name != null and name != ''">
+                and name like concat('%' , #{name} , '%')
+            </if>
+            <if test="status != null and status != ''">
+                and status = #{status}
+            </if>
+            <if test="params.beginTime != null and params.beginTime != '' ">
+                and create_time &gt;= #{params.beginTime}
+            </if>
+            <if test="params.endTime != null and params.endTime != '' ">
+                and create_time &lt;= #{params.endTime}
+            </if>
+        </where>
+    </select>
+    <select id="checkUserNameUnique" resultType="com.example.commonutils.entity.User">
+        select id, name from user where name = #{name}  limit 1
+    </select>
+    <select id="selectUserByUserName" resultType="com.example.commonutils.entity.User">
+        select * from user where name = #{name} and is_deleted = '0'
+    </select>
+
+    <insert id="insertUser" parameterType="User" useGeneratedKeys="true" keyProperty="id">
+        insert into user(
+        <if test="id != null and id != 0">id,</if>
+        <if test="name != null and name != ''">name,</if>
+        <if test="sex != null and sex != ''">sex,</if>
+        <if test="pwd != null and pwd != ''">pwd,</if>
+        <if test="status != null and status != ''">status,</if>
+        create_time
+        )values(
+        <if test="id != null and id != ''">#{id},</if>
+        <if test="name != null and name != ''">#{name},</if>
+        <if test="sex != null and sex != ''">#{sex},</if>
+        <if test="pwd != null and pwd != ''">#{pwd},</if>
+        <if test="status != null and status != ''">#{status},</if>
+        sysdate()
+        )
+    </insert>
+
+    <update id="updateUser" parameterType="User">
+        update user
+        <set>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="sex != null and sex != ''">sex = #{sex},</if>
+            <if test="pwd != null and pwd != ''">pwd = #{pwd},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            update_time = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+</mapper>

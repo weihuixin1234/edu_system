@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.commonutils.mapper.CourseMapper">
+    <update id="updateSelectPeople">
+        update course set select_num = select_num + 1 where course_id = #{courseId}
+    </update>
+    <update id="dropSelectPeople">
+        update course set select_num = select_num - 1 where course_id = #{courseId}
+    </update>
+    <delete id="updateCourseById">
+        delete from course where course_id = #{courseId}
+    </delete>
+    <select id="checkCourseNameUnique" resultType="com.example.commonutils.entity.Course">
+        select course_id, course_name from course where course_name = #{courseName}  limit 1
+    </select>
+<!--    <select id="getCourseList" resultType="com.example.commonutils.entity.Course">-->
+<!--        select  c.* , t.teacher_name from teacher t , course c-->
+<!--        where t.teacher_id = (select ct.teacher_id from course c , course_teacher ct-->
+<!--                               where c.course_id = ct.course_id )-->
+<!--    </select>-->
+    <select id="getCourseList" resultType="com.example.commonutils.entity.Course">
+        select c.* , t.teacher_name from course c , teacher t  , course_teacher ct
+        <where>
+            <if test="courseId != null and courseId != ''">
+                c.course_id like concat('%' , #{courseId} , '%')
+            </if>
+            <if test="courseName != null and courseName != ''">
+                and course_name like concat('%' , #{courseName} , '%')
+            </if>
+            <if test="courseCredit != null and courseCredit != ''">
+                and course_credit = #{courseCredit}
+            </if>
+            <if test="courseTime != null and courseTime != ''">
+                and  course_time = #{courseTime}
+            </if>
+            <if test="coursePeriod != null and coursePeriod != ''">
+                 and course_period = #{coursePeriod}
+            </if>
+            and c.course_id = ct.course_id
+            and t.teacher_id = ct.teacher_id
+        </where>
+    </select>
+    <select id="getAlreadyClass" resultType="com.example.commonutils.entity.Course">
+        select DISTINCT course.* , t.teacher_name from course  , user u , teacher t , course_student cs , course_teacher ct
+         <where>
+             <if test="userId != null and userId != ''">
+                 cs.stu_id = #{userId}
+             </if>
+             <if test="coursePeriod != null and coursePeriod != ''">
+                and course_period = #{coursePeriod}
+             </if>
+             and course.course_id = cs.course_id
+             and u.id = cs.stu_id
+             and ct.teacher_id = t.teacher_id
+             and course.course_id = ct.course_id
+         </where>
+--         where c.course_id = cs.course_id
+--           and u.id = cs.stu_id
+--           and ct.teacher_id = t.teacher_id
+--           and c.course_id = ct.course_id
+--           and cs.stu_id = '1'
+    </select>
+</mapper>

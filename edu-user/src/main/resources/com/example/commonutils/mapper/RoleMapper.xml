@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.commonutils.mapper.RoleMapper">
+<!--    连表查询的sql语句，写一遍就不用在单独写了
+        列表展示和列表查询展示角色信息的sql
+        后面可以用<include refid = "selectRoleVo" />进行引用-->
+    <sql id="selectRoleVo">
+        select distinct r.role_id, r.role_name, r.role_key, r.role_sort, r.data_scope, r.menu_check_strictly, r.dept_check_strictly,
+                        r.status, r.del_flag, r.create_time, r.remark
+        from sys_role r
+                 left join sys_user_role ur on ur.role_id = r.role_id
+                 left join sys_user u on u.user_id = ur.user_id
+                 left join sys_dept d on u.dept_id = d.dept_id
+    </sql>
+    <delete id="deleteRoleByIds">
+        delete from role where role_id in
+        <foreach collection="array" item="roleId" open="(" separator="," close=")">
+            #{roleId}
+        </foreach>
+    </delete>
+
+
+    <select id="getRoleList" resultType="com.example.commonutils.entity.Role">
+        select * from role
+        <where>
+            <if test="roleId != null and roleId != 0">
+                AND role_id = #{roleId}
+            </if>
+            <if test="roleName != null and roleName != ''">
+                AND role_name like concat('%', #{roleName}, '%')
+            </if>
+            <if test="roleDesc != null and roleDesc != ''">
+                AND role_desc like concat('%', #{roleDesc}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                and create_time &gt;= #{params.beginTime}
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                and create_time &lt;= #{params.endTime}
+            </if>
+        </where>
+
+    </select>
+    <select id="selectByRoleId" resultType="com.example.commonutils.entity.Role">
+        select * from role
+        <where>
+            <if test="roleId != null and roleId != ''">
+                role_id = #{roleId}
+            </if>
+        </where>
+    </select>
+    <select id="getAllRoleList" resultType="com.example.commonutils.entity.Role">
+        select * from role
+    </select>
+    <select id="getUserAndRoleById" resultType="com.example.commonutils.entity.Role">
+        select * from role where role_id = #{roleId}
+    </select>
+</mapper>

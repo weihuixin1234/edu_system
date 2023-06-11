@@ -1,0 +1,11 @@
+jwt:
+  # jwt存储的请求头
+  tokenHeader: Authorization
+  #jwt 加解密使用的密钥
+  secret: yeb-secret
+  # jwt的超期限时间60*60*24
+  expiration: 30L
+  #jwt负载中拿到开头
+  tokenHead: Bearer
+
+

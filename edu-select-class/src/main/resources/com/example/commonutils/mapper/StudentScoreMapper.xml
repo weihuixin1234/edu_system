@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.commonutils.mapper.StudentScoreMapper">
+
+    <select id="getStuScoreList" resultType="com.example.commonutils.entity.ScoreTable">
+        select u.id as stuno,u.name as stuname,u.sex as stusex,
+               sum(case course_name when 'java基础' then score else 0 end) as javajc,
+               sum(case course_name when '大数据商务分析' then score else 0 end) as dsjswfx,
+               sum(case course_name when '形势政策' then score else 0 end) as xszc,
+               sum(case course_name when 'linux基础' then score else 0 end) as linuxjc,
+               sum(case course_name when '算法设计与分析' then score else 0 end) as sfsjyfx,
+               sum(case course_name when '有机化学' then score else 0 end) as yjhx,
+               convert(sum(score)/6,decimal(5,2)) as average,
+               convert(sum(score),decimal(5,2)) as total
+        from user u,course c,student_score ss
+        <where>
+            u.id=ss.stu_no and c.course_id=ss.course_no
+            <if test="stuNo != null and stuNo != ''">
+              and  u.id = #{stuNo}
+            </if>
+            <if test="courseNo != null and courseNo != ''">
+                and c.course_id = #{courseNo}
+            </if>
+
+        </where>
+        group by u.id order by sum(score) desc
+    </select>
+</mapper>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.commonutils.mapper.CourseStudentMapper">
+    <delete id="dropClass">
+        delete from course_student
+        <where>
+            <if test="userId != null and userId != ''">
+                stu_id = #{userId}
+            </if>
+            <if test="courseId != null and courseId != ''">
+               and  course_id = #{courseId}
+            </if>
+        </where>
+    </delete>
+    <!--    <insert id="insertClass">-->
+<!--        insert into course_student values (null , #{course_id} , #{stu_id})-->
+<!--    </insert>-->
+    <select id="selectClass" resultType="string">
+        select course_id from course_student where stu_id = #{userId}
+    </select>
+</mapper>
